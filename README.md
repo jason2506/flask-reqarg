@@ -1,5 +1,7 @@
 # Flask-ReqArg
 
+[![Build Status](https://secure.travis-ci.org/jason2506/flask-reqarg.png)](http://travis-ci.org/jason2506/flask-reqarg)
+
 **ReqArg** is a [Flask](http://flask.pocoo.org/) extension that maps request arguments into function arguments.
 
 ## Overview
