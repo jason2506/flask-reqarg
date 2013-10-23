@@ -12,7 +12,6 @@ __all__ = (
     'args',
     'files',
     'cookies',
-    'session',
     'collection'
 )
 
@@ -26,8 +25,6 @@ def _get_storage_dict_map(request):
         '_cookies': request.cookies,
         '_request': request,
     }
-    if hasattr(request, 'session'):
-        result['_session'] = request.session
     return result
 
 
@@ -99,23 +96,6 @@ def files(name=None):
 def cookies(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.cookies.get(name or arg_name, default, type)
-    return getter
-
-
-def session(name=None, default=None, type=None, remove=False):
-    def getter(request, arg_name):
-        arg = name or arg_name
-        result = default
-        if arg in request.session:
-            result = request.session[arg]
-            if type:
-                try:
-                    result = type(result)
-                except TypeError:
-                    result = default
-            if remove:
-                del request.session[arg]
-        return result
     return getter
 
 
