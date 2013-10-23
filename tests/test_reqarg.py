@@ -1,14 +1,15 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request
+from flask import Flask
 from nose.tools import assert_equal
 
 from flaskext.reqarg import *
 
+
 class TestReqArg(object):
     def setUp(self):
         self.app = Flask(__name__)
+
 
     def test_fetch_request_args(self):
         @request_args
@@ -18,6 +19,7 @@ class TestReqArg(object):
         with self.app.test_request_context(
                 query_string={'name': 'John'}):
             assert_equal(view(), 'Hello, John!')
+
 
     def test_fetch_GET_and_POST_args(self):
         @request_args(x=get(), y=post(), z=args())
@@ -36,6 +38,7 @@ class TestReqArg(object):
                 data={'x': 'ijk'}):
             assert_equal(view(), 'x=None,y=None,z=abc')
 
+
     def test_fetch_request_args_with_options(self):
         @request_args(get(default='bar'), z=get(type=int, default=999))
         def view(x, y, z):
@@ -51,6 +54,7 @@ class TestReqArg(object):
 
         with self.app.test_request_context():
             assert_equal(view(), 'x=bar,y=None,z=999')
+
 
     def test_fetch_request_arg_collection(self):
         @request_args(article=collection('title', 'content', 'author'))

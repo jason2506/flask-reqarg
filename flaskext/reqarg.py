@@ -1,10 +1,10 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from functools import wraps
 from inspect import isfunction, getargspec
 
 from flask import request
+
 
 def _get_storage_dict_map(request):
     result = {
@@ -19,14 +19,17 @@ def _get_storage_dict_map(request):
         result['_session'] = request.session
     return result
 
+
 def _extract_method(kwargs):
     result = kwargs.pop('_method', 'args')
     if result not in ('post', 'get', 'args'):
         result = 'args'
     return result
 
+
 def _extract_storage_type(kwargs):
     return kwargs.pop('_storage', dict)
+
 
 def request_args(*args, **kwargs):
     method = _extract_method(kwargs)
@@ -57,30 +60,36 @@ def request_args(*args, **kwargs):
         return decorator(args[0], False)
     return decorator
 
+
 def get(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.args.get(name or arg_name, default, type)
     return getter
+
 
 def post(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.form.get(name or arg_name, default, type)
     return getter
 
+
 def args(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.values.get(name or arg_name, default, type)
     return getter
+
 
 def files(name=None):
     def getter(request, arg_name):
         return request.files.get(name or arg_name)
     return getter
 
+
 def cookies(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.cookies.get(name or arg_name, default, type)
     return getter
+
 
 def session(name=None, default=None, type=None, remove=False):
     def getter(request, arg_name):
@@ -97,6 +106,7 @@ def session(name=None, default=None, type=None, remove=False):
                 del request.session[arg]
         return result
     return getter
+
 
 def collection(*args, **kwargs):
     method = _extract_method(kwargs)
