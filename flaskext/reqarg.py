@@ -1,10 +1,20 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from functools import wraps
 from inspect import isfunction, getargspec
 
 from flask import request
+
+__all__ = (
+    'request_args',
+    'get',
+    'post',
+    'args',
+    'files',
+    'cookies',
+    'collection'
+)
+
 
 def _get_storage_dict_map(request):
     result = {
@@ -15,9 +25,8 @@ def _get_storage_dict_map(request):
         '_cookies': request.cookies,
         '_request': request,
     }
-    if hasattr(request, 'session'):
-        result['_session'] = request.session
     return result
+
 
 def _extract_method(kwargs):
     result = kwargs.pop('_method', 'args')
@@ -25,8 +34,10 @@ def _extract_method(kwargs):
         result = 'args'
     return result
 
+
 def _extract_storage_type(kwargs):
     return kwargs.pop('_storage', dict)
+
 
 def request_args(*args, **kwargs):
     method = _extract_method(kwargs)
@@ -57,46 +68,36 @@ def request_args(*args, **kwargs):
         return decorator(args[0], False)
     return decorator
 
+
 def get(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.args.get(name or arg_name, default, type)
     return getter
+
 
 def post(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.form.get(name or arg_name, default, type)
     return getter
 
+
 def args(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.values.get(name or arg_name, default, type)
     return getter
+
 
 def files(name=None):
     def getter(request, arg_name):
         return request.files.get(name or arg_name)
     return getter
 
+
 def cookies(name=None, default=None, type=None):
     def getter(request, arg_name):
         return request.cookies.get(name or arg_name, default, type)
     return getter
 
-def session(name=None, default=None, type=None, remove=False):
-    def getter(request, arg_name):
-        arg = name or arg_name
-        result = default
-        if arg in request.session:
-            result = request.session[arg]
-            if type:
-                try:
-                    result = type(result)
-                except TypeError:
-                    result = default
-            if remove:
-                del request.session[arg]
-        return result
-    return getter
 
 def collection(*args, **kwargs):
     method = _extract_method(kwargs)

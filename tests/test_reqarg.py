@@ -1,14 +1,27 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request
+try:
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
+
+from flask import Flask, make_response
 from nose.tools import assert_equal
 
 from flaskext.reqarg import *
 
+
+class Article(object):
+    def __init__(self, title, text, author):
+        self.title = title
+        self.content = text
+        self.author = author
+
+
 class TestReqArg(object):
     def setUp(self):
         self.app = Flask(__name__)
+
 
     def test_fetch_request_args(self):
         @request_args
@@ -18,6 +31,7 @@ class TestReqArg(object):
         with self.app.test_request_context(
                 query_string={'name': 'John'}):
             assert_equal(view(), 'Hello, John!')
+
 
     def test_fetch_GET_and_POST_args(self):
         @request_args(x=get(), y=post(), z=args())
@@ -36,6 +50,7 @@ class TestReqArg(object):
                 data={'x': 'ijk'}):
             assert_equal(view(), 'x=None,y=None,z=abc')
 
+
     def test_fetch_request_args_with_options(self):
         @request_args(get(default='bar'), z=get(type=int, default=999))
         def view(x, y, z):
@@ -52,10 +67,46 @@ class TestReqArg(object):
         with self.app.test_request_context():
             assert_equal(view(), 'x=bar,y=None,z=999')
 
+
+    def test_fetch_request_arg_files(self):
+        @request_args(hello=files())
+        def view(hello):
+            filename = hello.filename
+            content = hello.stream.read()
+            return '[{0}] {1}'.format(filename, content)
+
+        with self.app.test_request_context(
+                method='POST',
+                data={'hello': (StringIO('hello, world'), 'hello.txt')}):
+            assert_equal(view(), '[hello.txt] hello, world')
+
+
+    def test_fetch_request_arg_cookies(self):
+        @self.app.route('/set', methods=['POST'])
+        @request_args(val=post())
+        def set(val):
+            resp = make_response('done')
+            resp.set_cookie('val', val)
+            return resp
+
+        @self.app.route('/get')
+        @request_args(val=cookies())
+        def get(val):
+            return str(val)
+
+        client = self.app.test_client()
+        client.post('/set', data={'val': 'bar'})
+        assert_equal(client.get('/get').data, 'bar')
+
+
     def test_fetch_request_arg_collection(self):
         @request_args(article=collection('title', 'content', 'author'))
         def view(article):
             return 'Title: {title}\n{content}\nby. {author}'.format(**article)
+
+        @request_args(article=collection('title', 'author', text=get('content'), _storage=Article))
+        def view_(article):
+            return str(article)
 
         with self.app.test_request_context(
                 method='POST',
@@ -65,4 +116,5 @@ class TestReqArg(object):
                     'author': 'Mary'
                 }):
             assert_equal(view(), 'Title: FooBar\nfoobarfoobar\nby. Mary')
+            assert_equal(view_(), str(Article('FooBar', 'foobarfoobar', 'Mary')))
 
