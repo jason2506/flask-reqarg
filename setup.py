@@ -9,15 +9,14 @@ from setuptools import setup
 
 setup(
     name='Flask-ReqArg',
-    version='0.1.0',
+    version='0.1.1',
     url='https://github.com/jason2506/flask-reqarg/',
     license='BSD',
     author='Chi-En Wu',
     author_email='',
     description='The decorator that maps request arguments into function arguments.',
     long_description=__doc__,
-    packages=['flaskext'],
-    namespace_packages=['flaskext'],
+    packages=['flask_reqarg'],
     zip_safe=False,
     platforms='any',
     install_requires=['Flask'],

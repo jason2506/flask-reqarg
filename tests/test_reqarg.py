@@ -8,7 +8,7 @@ except:
 from flask import Flask, make_response
 from nose.tools import assert_equal
 
-from flaskext.reqarg import *
+from flask.ext.reqarg import *
 
 
 class Article(object):
