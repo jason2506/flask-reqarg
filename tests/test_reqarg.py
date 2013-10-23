@@ -6,6 +6,13 @@ from nose.tools import assert_equal
 from flaskext.reqarg import *
 
 
+class Article(object):
+    def __init__(self, title, text, author):
+        self.title = title
+        self.content = text
+        self.author = author
+
+
 class TestReqArg(object):
     def setUp(self):
         self.app = Flask(__name__)
@@ -61,6 +68,10 @@ class TestReqArg(object):
         def view(article):
             return 'Title: {title}\n{content}\nby. {author}'.format(**article)
 
+        @request_args(article=collection('title', 'author', text=get('content'), _storage=Article))
+        def view_(article):
+            return str(article)
+
         with self.app.test_request_context(
                 method='POST',
                 data={
@@ -69,4 +80,5 @@ class TestReqArg(object):
                     'author': 'Mary'
                 }):
             assert_equal(view(), 'Title: FooBar\nfoobarfoobar\nby. Mary')
+            assert_equal(view_(), str(Article('FooBar', 'foobarfoobar', 'Mary')))
 
