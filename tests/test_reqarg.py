@@ -18,6 +18,10 @@ class Article(object):
         self.author = author
 
 
+    def __str__(self):
+        return 'Title: {0.title}\n{0.content}\nby. {0.author}'.format(self)
+
+
 class TestReqArg(object):
     def setUp(self):
         self.app = Flask(__name__)
@@ -104,7 +108,7 @@ class TestReqArg(object):
         def view(article):
             return 'Title: {title}\n{content}\nby. {author}'.format(**article)
 
-        @request_args(article=collection('title', 'author', text=get('content'), _storage=Article))
+        @request_args(article=collection('title', 'author', text=post('content'), _storage=Article))
         def view_(article):
             return str(article)
 
@@ -116,5 +120,5 @@ class TestReqArg(object):
                     'author': 'Mary'
                 }):
             assert_equal(view(), 'Title: FooBar\nfoobarfoobar\nby. Mary')
-            assert_equal(view_(), str(Article('FooBar', 'foobarfoobar', 'Mary')))
+            assert_equal(view_(), 'Title: FooBar\nfoobarfoobar\nby. Mary')
 
