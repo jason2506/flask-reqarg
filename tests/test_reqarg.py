@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
+
 from flask import Flask
 from nose.tools import assert_equal
 
@@ -61,6 +66,19 @@ class TestReqArg(object):
 
         with self.app.test_request_context():
             assert_equal(view(), 'x=bar,y=None,z=999')
+
+
+    def test_fetch_request_arg_files(self):
+        @request_args(hello=files())
+        def view(hello):
+            filename = hello.filename
+            content = hello.stream.read()
+            return '[{0}] {1}'.format(filename, content)
+
+        with self.app.test_request_context(
+                method='POST',
+                data={'hello': (StringIO('hello, world'), 'hello.txt')}):
+            assert_equal(view(), '[hello.txt] hello, world')
 
 
     def test_fetch_request_arg_collection(self):
