@@ -5,6 +5,17 @@ from inspect import isfunction, getargspec
 
 from flask import request
 
+__all__ = (
+    'request_args',
+    'get',
+    'post',
+    'args',
+    'files',
+    'cookies',
+    'session',
+    'collection'
+)
+
 
 def _get_storage_dict_map(request):
     result = {
