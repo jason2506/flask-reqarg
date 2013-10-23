@@ -5,7 +5,7 @@ try:
 except:
     from StringIO import StringIO
 
-from flask import Flask
+from flask import Flask, make_response
 from nose.tools import assert_equal
 
 from flaskext.reqarg import *
@@ -79,6 +79,24 @@ class TestReqArg(object):
                 method='POST',
                 data={'hello': (StringIO('hello, world'), 'hello.txt')}):
             assert_equal(view(), '[hello.txt] hello, world')
+
+
+    def test_fetch_request_arg_cookies(self):
+        @self.app.route('/set', methods=['POST'])
+        @request_args(val=post())
+        def set(val):
+            resp = make_response('done')
+            resp.set_cookie('val', val)
+            return resp
+
+        @self.app.route('/get')
+        @request_args(val=cookies())
+        def get(val):
+            return str(val)
+
+        client = self.app.test_client()
+        client.post('/set', data={'val': 'bar'})
+        assert_equal(client.get('/get').data, 'bar')
 
 
     def test_fetch_request_arg_collection(self):
