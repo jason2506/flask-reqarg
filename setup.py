@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name='Flask-ReqArg',
-    version='0.1.1',
+    version='0.1.2',
     url='https://github.com/jason2506/flask-reqarg/',
     license='BSD',
     author='Chi-En Wu',
