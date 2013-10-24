@@ -57,7 +57,7 @@ class TestReqArg(object):
         with self.app.test_request_context():
             assert_equal(view(), 'x=bar,y=None,z=999')
 
-    def test_fetch_request_arg_files(self):
+    def test_fetch_files(self):
         @request_args(hello=files())
         def view(hello):
             filename = hello.filename
@@ -72,7 +72,7 @@ class TestReqArg(object):
                 data={'hello': (stream, 'hello.txt')}):
             assert_equal(view(), '[hello.txt] hello, world')
 
-    def test_fetch_request_arg_cookies(self):
+    def test_fetch_cookies(self):
         @self.app.route('/set', methods=['POST'])
         @request_args(val=post())
         def set(val):
@@ -90,7 +90,7 @@ class TestReqArg(object):
         resp = client.get('/get')
         assert_equal(resp.get_data(True), 'bar')
 
-    def test_fetch_request_arg_collection(self):
+    def test_fetch_collection(self):
         class Article(object):
             def __init__(self, title, text, author):
                 self.title = title
