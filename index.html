@@ -1,0 +1,181 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to Flask-ReqArg &mdash; Flask-ReqArg 0.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Flask-ReqArg 0.1.3 documentation" href="#" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body>
+  
+  
+  <div class=indexwrapper>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="#">Flask-ReqArg 0.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-flask-reqarg">
+<h1>Welcome to Flask-ReqArg<a class="headerlink" href="#welcome-to-flask-reqarg" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="decorator">
+<h3>Decorator<a class="headerlink" href="#decorator" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="flask.ext.reqarg.request_arg">
+<tt class="descclassname">&#64;</tt><tt class="descclassname">flask.ext.reqarg.</tt><tt class="descname">request_arg</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#flask.ext.reqarg.request_arg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binds request arguments to function arguments.</p>
+<p>The simplest way to use it is to put this decorator on the line before the view function, then use the name of GET or POST arguments as the name of function arguments:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@request_args</span>
+<span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">):</span>
+    <span class="c"># rest of code</span>
+</pre></div>
+</div>
+<p>and it is equal to the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">bar</span><span class="p">():</span>
+    <span class="n">arg1</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;arg1&#39;</span><span class="p">)</span>
+    <span class="n">arg2</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;arg2&#39;</span><span class="p">)</span>
+    <span class="n">arg3</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;arg3&#39;</span><span class="p">)</span>
+    <span class="c"># rest of code</span>
+</pre></div>
+</div>
+<p>As you can see, the value of request arguments will be automatically bound to the corresponding function arguments.</p>
+<p>This also accepts some <a class="reference internal" href="#argument-fetcher"><em>fetchers</em></a> as arguments to specify the method or name of the request arguments. The target function argument be bound depends on the position of fetcher in the <tt class="docutils literal"><span class="pre">args</span></tt> and the name set in the <tt class="docutils literal"><span class="pre">kwargs</span></tt>.</p>
+<p>Here&#8217;s a more complex example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@request_args</span><span class="p">(</span><span class="n">get</span><span class="p">(),</span> <span class="n">z</span><span class="o">=</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="c"># rest of code</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#flask.ext.reqarg.get" title="flask.ext.reqarg.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a> fetcher, which is first argument of <tt class="xref py py-func docutils literal"><span class="pre">request_args()</span></tt>, binds first function argument <tt class="docutils literal"><span class="pre">x</span></tt> to the GET argument with the same name. And the <a class="reference internal" href="#flask.ext.reqarg.post" title="flask.ext.reqarg.post"><tt class="xref py py-func docutils literal"><span class="pre">post()</span></tt></a> fetcher binds the function argument <tt class="docutils literal"><span class="pre">z</span></tt> to the POST argument <tt class="docutils literal"><span class="pre">a</span></tt>.</p>
+<p>The function argument <tt class="docutils literal"><span class="pre">y</span></tt>, on the other hand, are not explicitly specified in the argument of <tt class="xref py py-func docutils literal"><span class="pre">request_args()</span></tt>. As a result, it is bound to the argument passed by GET or POST method (by default).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="argument-fetcher">
+<span id="id1"></span><h3>Argument Fetcher<a class="headerlink" href="#argument-fetcher" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="flask.ext.reqarg.get">
+<tt class="descclassname">flask.ext.reqarg.</tt><tt class="descname">get</tt><big>(</big><em>name=None</em>, <em>default=None</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#flask.ext.reqarg.get" title="Permalink to this definition">¶</a></dt>
+<dt id="flask.ext.reqarg.post">
+<tt class="descclassname">flask.ext.reqarg.</tt><tt class="descname">post</tt><big>(</big><em>name=None</em>, <em>default=None</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#flask.ext.reqarg.post" title="Permalink to this definition">¶</a></dt>
+<dt id="flask.ext.reqarg.args">
+<tt class="descclassname">flask.ext.reqarg.</tt><tt class="descname">args</tt><big>(</big><em>name=None</em>, <em>default=None</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#flask.ext.reqarg.args" title="Permalink to this definition">¶</a></dt>
+<dt id="flask.ext.reqarg.cookies">
+<tt class="descclassname">flask.ext.reqarg.</tt><tt class="descname">cookies</tt><big>(</big><em>name=None</em>, <em>default=None</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#flask.ext.reqarg.cookies" title="Permalink to this definition">¶</a></dt>
+<dt id="flask.ext.reqarg.files">
+<tt class="descclassname">flask.ext.reqarg.</tt><tt class="descname">files</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#flask.ext.reqarg.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches request argument and maps it to the function argument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; The name of request argument. If <tt class="docutils literal"><span class="pre">name</span></tt> is not given, it treats the name of corresponding argument as the name of requment argument.</li>
+<li><strong>default</strong> &#8211; The default value to be used if the requested data doesn&#8217;t exist.</li>
+<li><strong>type</strong> &#8211; A callable that is used to convert the retrieved value. If the value can&#8217;t be converted, the corresponding function argument will be set to the default value.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="flask.ext.reqarg.collection">
+<tt class="descclassname">flask.ext.reqarg.</tt><tt class="descname">collection</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#flask.ext.reqarg.collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Puts the retrieved request arguments in a collection (default is <tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt>), and then maps it to the function argument.</p>
+<p>This function can have the <tt class="docutils literal"><span class="pre">_storage</span></tt> argument to specify a callable which accepts arguments and creates the collection object.</p>
+<p>Other acceptable arguments are same as <a class="reference internal" href="#flask.ext.reqarg.request_arg" title="flask.ext.reqarg.request_arg"><tt class="xref py py-func docutils literal"><span class="pre">request_arg()</span></tt></a>.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Flask-ReqArg</a><ul>
+<li><a class="reference internal" href="#api-reference">API Reference</a><ul>
+<li><a class="reference internal" href="#decorator">Decorator</a></li>
+<li><a class="reference internal" href="#argument-fetcher">Argument Fetcher</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2011-2013, Chi-En Wu.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </div>
+  
+  </body>
+</html>
