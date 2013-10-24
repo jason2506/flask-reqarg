@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/jason2506/flask-reqarg.png)](http://travis-ci.org/jason2506/flask-reqarg)
 
-**ReqArg** is a [Flask](http://flask.pocoo.org/) extension that maps request arguments into function arguments.
+**flask-reqarg** is a [Flask](http://flask.pocoo.org/) extension that maps request arguments into function arguments.
 
 ## Overview
 
@@ -17,9 +17,9 @@ If we want to get the request arguments, such as parameters passed by GET or POS
         arg3 = request.args.get('arg_name3')
         # rest of code
 
-By using **ReqArg**, you can simply apply the `@request_args` decorator to bind request arguments to function arguments:
+By using **flask-reqarg**, you can simply apply the `@request_args` decorator to bind request arguments to function arguments:
 
-    from flaskext.reqarg import request_args
+    from flask.ext.reqarg import request_args
 
     @app.route('/foo')
     @request_args
