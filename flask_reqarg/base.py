@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from sys import version_info
 from abc import ABCMeta, abstractproperty
 from functools import wraps
 from inspect import isfunction, getargspec
-from itertools import izip
+
+if version_info[0] == 2:
+    from itertools import izip as zip
 
 __all__ = (
     'get',
@@ -154,11 +157,11 @@ class RequestWrapperBase(object):
         def decorator(func, spec=True):
             func_arg_names = getargspec(func)[0]
             if spec:
-                kwargs.update(izip(func_arg_names, args))
+                kwargs.update(zip(func_arg_names, args))
 
             @wraps(func)
             def wrapper(*func_args, **func_kwargs):
-                values = dict(izip(func_arg_names, func_args))
+                values = dict(zip(func_arg_names, func_args))
                 request = cls.create(*func_args, **func_kwargs)
                 for arg_name in func_arg_names:
                     if arg_name in func_kwargs:
