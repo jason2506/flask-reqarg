@@ -87,7 +87,7 @@ Decorator
 
     Binds request arguments to function arguments.
 
-    :param `_method`: The default request method of the retrieved arguments. Acceptable values include: ``'get'`` (GET method), ``'post'`` (POST method), and ``'args'`` (GET or POST method). Defaults to ``'args'``.
+    :param `_source`: The default source of the request arguments. Acceptable values include: ``'get'`` (GET method), ``'post'`` (POST method), ``'args'`` (GET or POST method), ``'files'`` (files from POST or PUT method), and ``'cookies'``. Defaults to ``'args'``.
 
     This decorator also accepts some :ref:`fetchers <argument_fetcher>` as arguments. See :ref:`using_fetchers`.
 

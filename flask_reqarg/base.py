@@ -19,9 +19,9 @@ __all__ = (
 )
 
 
-def _extract_method(kwargs):
-    result = kwargs.pop('_method', 'args')
-    if result not in ('post', 'get', 'args'):
+def _extract_source(kwargs):
+    result = kwargs.pop('_source', 'args')
+    if result not in ('post', 'get', 'args', 'files', 'cookies'):
         result = 'args'
     return result
 
@@ -71,13 +71,13 @@ def cookies(name=None, default=None, type=None):
 
 
 def collection(*args, **kwargs):
-    method = _extract_method(kwargs)
+    source = _extract_source(kwargs)
     storage_type = _extract_storage_type(kwargs)
 
     def getter(request, arg_name):
         values = {}
         for arg in args:
-            values[arg] = request.fetch(method, arg)
+            values[arg] = request.from_source(source, arg)
         for arg, arg_getter in kwargs.items():
             values[arg] = arg_getter(request, arg)
         return storage_type(**values)
@@ -98,14 +98,8 @@ class RequestWrapperBase(object):
             '_files': self.files_dict
         }
 
-    def __contains__(self, name):
-        return name in self._storage_dict_map
-
-    def __getitem__(self, name):
-        return self._storage_dict_map[name]
-
-    def fetch(self, method, name):
-        return self._storage_dict_map['_' + method].get(name)
+    def from_source(self, source, name):
+        return self._storage_dict_map['_' + source].get(name)
 
     def from_get(self, name, default, type):
         return _fetch_from_dict(self.get_dict, name, default, type)
@@ -152,7 +146,7 @@ class RequestWrapperBase(object):
 
     @classmethod
     def request_args(cls, *args, **kwargs):
-        method = _extract_method(kwargs)
+        source = _extract_source(kwargs)
 
         def decorator(func, spec=True):
             func_arg_names = getargspec(func)[0]
@@ -166,12 +160,10 @@ class RequestWrapperBase(object):
                 for arg_name in func_arg_names:
                     if arg_name in func_kwargs:
                         values[arg_name] = func_kwargs[arg_name]
-                    elif arg_name in request:
-                        values[arg_name] = request[arg_name]
                     elif arg_name in kwargs:
                         values[arg_name] = kwargs[arg_name](request, arg_name)
                     else:
-                        values[arg_name] = request.fetch(method, arg_name)
+                        values[arg_name] = request.from_source(source, arg_name)
                 return func(**values)
             return wrapper
 

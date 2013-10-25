@@ -57,6 +57,21 @@ class TestReqArg(object):
         with self.app.test_request_context():
             assert_equal(view(), 'x=bar,y=None,z=999')
 
+    def test_fetch_request_args_with_default_source(self):
+        @request_args(get(), z=get(), _source='post')
+        def view(x, y, z):
+            return 'x={0},y={1},z={2}'.format(x, y, z)
+
+        with self.app.test_request_context(
+                method='POST',
+                query_string={'x': 'pqr', 'z': '123'},
+                data={'y': 'ijk'}):
+            assert_equal(view(), 'x=pqr,y=ijk,z=123')
+
+        with self.app.test_request_context(
+                query_string={'x': 'pqr', 'y': 'ijk', 'z': '123'}):
+            assert_equal(view(), 'x=pqr,y=None,z=123')
+
     def test_fetch_files(self):
         @request_args(hello=files())
         def view(hello):
