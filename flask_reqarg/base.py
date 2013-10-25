@@ -77,7 +77,7 @@ def collection(*args, **kwargs):
     def getter(request, arg_name):
         values = {}
         for arg in args:
-            values[arg] = request.fetch(source, arg)
+            values[arg] = request.from_source(source, arg)
         for arg, arg_getter in kwargs.items():
             values[arg] = arg_getter(request, arg)
         return storage_type(**values)
@@ -98,7 +98,7 @@ class RequestWrapperBase(object):
             '_files': self.files_dict
         }
 
-    def fetch(self, source, name):
+    def from_source(self, source, name):
         return self._storage_dict_map['_' + source].get(name)
 
     def from_get(self, name, default, type):
@@ -163,7 +163,7 @@ class RequestWrapperBase(object):
                     elif arg_name in kwargs:
                         values[arg_name] = kwargs[arg_name](request, arg_name)
                     else:
-                        values[arg_name] = request.fetch(source, arg_name)
+                        values[arg_name] = request.from_source(source, arg_name)
                 return func(**values)
             return wrapper
 
