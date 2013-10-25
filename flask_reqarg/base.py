@@ -98,12 +98,6 @@ class RequestWrapperBase(object):
             '_files': self.files_dict
         }
 
-    def __contains__(self, name):
-        return name in self._storage_dict_map
-
-    def __getitem__(self, name):
-        return self._storage_dict_map[name]
-
     def fetch(self, source, name):
         return self._storage_dict_map['_' + source].get(name)
 
@@ -166,8 +160,6 @@ class RequestWrapperBase(object):
                 for arg_name in func_arg_names:
                     if arg_name in func_kwargs:
                         values[arg_name] = func_kwargs[arg_name]
-                    elif arg_name in request:
-                        values[arg_name] = request[arg_name]
                     elif arg_name in kwargs:
                         values[arg_name] = kwargs[arg_name](request, arg_name)
                     else:
