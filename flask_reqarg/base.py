@@ -19,14 +19,14 @@ __all__ = (
 )
 
 
-def _extract_source(kwargs):
+def _extract_opt_source(kwargs):
     result = kwargs.pop('_source', 'args')
     if result not in ('post', 'get', 'args', 'files', 'cookies'):
         result = 'args'
     return result
 
 
-def _extract_storage_type(kwargs):
+def _extract_opt_storage_type(kwargs):
     return kwargs.pop('_storage', dict)
 
 
@@ -71,8 +71,8 @@ def cookies(name=None, default=None, type=None):
 
 
 def collection(*args, **kwargs):
-    source = _extract_source(kwargs)
-    storage_type = _extract_storage_type(kwargs)
+    source = _extract_opt_source(kwargs)
+    storage_type = _extract_opt_storage_type(kwargs)
 
     def getter(request, arg_name):
         values = {}
@@ -146,7 +146,7 @@ class RequestWrapperBase(object):
 
     @classmethod
     def request_args(cls, *args, **kwargs):
-        source = _extract_source(kwargs)
+        source = _extract_opt_source(kwargs)
 
         def decorator(func, spec=True):
             func_arg_names = getargspec(func)[0]
@@ -155,14 +155,13 @@ class RequestWrapperBase(object):
 
             @wraps(func)
             def wrapper(*func_args, **func_kwargs):
-                values = dict(zip(func_arg_names, func_args))
                 request = cls.create(*func_args, **func_kwargs)
+
+                values = func_kwargs.copy()
                 for arg_name in func_arg_names:
-                    if arg_name in func_kwargs:
-                        values[arg_name] = func_kwargs[arg_name]
-                    elif arg_name in kwargs:
+                    if arg_name in kwargs:
                         values[arg_name] = kwargs[arg_name](request, arg_name)
-                    else:
+                    elif arg_name not in values:
                         values[arg_name] = request.from_source(source, arg_name)
                 return func(**values)
             return wrapper

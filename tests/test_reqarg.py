@@ -16,13 +16,21 @@ class TestReqArg(object):
         self.app = Flask(__name__)
 
     def test_fetch_request_args(self):
+        @self.app.route('/hello')
         @request_args
         def view(name):
             return 'Hello, {0}!'.format(name)
 
-        with self.app.test_request_context(
-                query_string={'name': 'John'}):
-            assert_equal(view(), 'Hello, John!')
+        @self.app.route('/hello/<name>')
+        @request_args
+        def view_with_name(name):
+            return 'Hello, {0}!'.format(name)
+
+        client = self.app.test_client()
+        resp = client.get('/hello', query_string={'name': 'John'})
+        assert_equal(resp.get_data(True), 'Hello, John!')
+        resp = client.get('/hello/Jason', query_string={'name': 'John'})
+        assert_equal(resp.get_data(True), 'Hello, Jason!')
 
     def test_fetch_GET_and_POST_args(self):
         @request_args(x=get(), y=post(), z=args())
@@ -41,7 +49,7 @@ class TestReqArg(object):
                 data={'x': 'ijk'}):
             assert_equal(view(), 'x=None,y=None,z=abc')
 
-    def test_fetch_request_args_with_options(self):
+    def test_fetch_request_args_with_opts(self):
         @request_args(get(default='bar'), z=get(type=int, default=999))
         def view(x, y, z):
             return 'x={0},y={1},z={2}'.format(x, y, z)
