@@ -40,34 +40,50 @@ def _fetch_from_dict(d, name, default, type):
     return result
 
 
-def get(name=None, default=None, type=None):
-    def getter(request, arg_name):
+def get(name=None, default=None, type=None, getlist=False):
+    def fetch_one(request, arg_name):
         return request.from_get(name or arg_name, default, type)
-    return getter
+
+    def fetch_all(request, arg_name):
+        return request.list_from_get(name or arg_name)
+
+    return fetch_all if getlist else fetch_one
 
 
-def post(name=None, default=None, type=None):
-    def getter(request, arg_name):
+def post(name=None, default=None, type=None, getlist=False):
+    def fetch_one(request, arg_name):
         return request.from_post(name or arg_name, default, type)
-    return getter
+
+    def fetch_all(request, arg_name):
+        return request.list_from_post(name or arg_name)
+
+    return fetch_all if getlist else fetch_one
 
 
-def args(name=None, default=None, type=None):
-    def getter(request, arg_name):
+def args(name=None, default=None, type=None, getlist=False):
+    def fetch_one(request, arg_name):
         return request.from_get_or_post(name or arg_name, default, type)
-    return getter
+
+    def fetch_all(request, arg_name):
+        return request.list_from_get_or_post(name or arg_name)
+
+    return fetch_all if getlist else fetch_one
 
 
-def files(name=None):
-    def getter(request, arg_name):
+def files(name=None, getlist=False):
+    def fetch_one(request, arg_name):
         return request.from_files(name or arg_name)
-    return getter
+
+    def fetch_all(request, arg_name):
+        return request.list_from_files(name or arg_name)
+
+    return fetch_all if getlist else fetch_one
 
 
 def cookies(name=None, default=None, type=None):
-    def getter(request, arg_name):
+    def fetch(request, arg_name):
         return request.from_cookies(name or arg_name, default, type)
-    return getter
+    return fetch
 
 
 def collection(*args, **kwargs):
@@ -115,6 +131,18 @@ class RequestWrapperBase(object):
 
     def from_files(self, name):
         return self.files_dict.get(name)
+
+    def list_from_get(self, name):
+        return self.get_dict.getlist(name)
+
+    def list_from_post(self, name):
+        return self.post_dict.getlist(name)
+
+    def list_from_get_or_post(self, name):
+        return self.args_dict.getlist(name)
+
+    def list_from_files(self, name):
+        return self.files_dict.getlist(name)
 
     @property
     def request(self):

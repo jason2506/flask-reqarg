@@ -6,6 +6,7 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 from flask import Flask, make_response
+from flask.views import View, MethodView
 from nose.tools import assert_equal
 
 from flask.ext.reqarg import *
@@ -64,6 +65,15 @@ class TestReqArg(object):
 
         with self.app.test_request_context():
             assert_equal(view(), 'x=bar,y=None,z=999')
+
+    def test_fetch_request_args_list(self):
+        @request_args(args=get(getlist=True))
+        def view(args):
+            return ', '.join(args)
+
+        with self.app.test_request_context(
+                query_string={'args': ['abc', 'ijk', 'xyz']}):
+            assert_equal(view(), 'abc, ijk, xyz')
 
     def test_fetch_request_args_with_default_source(self):
         @request_args(get(), z=get(), _source='post')

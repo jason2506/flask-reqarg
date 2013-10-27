@@ -56,9 +56,9 @@ The simplest way to use it is to put the :func:`@request_args <request_args>` de
 As you can see, the value of request arguments will be automatically bound to the corresponding function arguments. This can make your code simpler and more clear.
 
 
-.. _using_fetchers:
+.. _using_fetcher:
 
-Using the Fetchers
+Using the Fetcher
 ------------------
 
 For explicitly specifying the request method or argument names to be bound, :func:`@request_args <request_args>` also accepts some :ref:`fetchers <argument_fetcher>` as its arguments.
@@ -89,7 +89,7 @@ Decorator
 
     :param `_source`: The default source of the request arguments. Acceptable values include: ``'get'`` (GET method), ``'post'`` (POST method), ``'args'`` (GET or POST method), ``'files'`` (files from POST or PUT method), and ``'cookies'``. Defaults to ``'args'``.
 
-    This decorator also accepts some :ref:`fetchers <argument_fetcher>` as arguments. See :ref:`using_fetchers`.
+    This decorator also accepts some :ref:`fetchers <argument_fetcher>` as arguments. See :ref:`using_fetcher`.
 
 
 .. _argument_fetcher:
@@ -98,17 +98,18 @@ Argument Fetcher
 ````````````````
 
 .. function::
-    get(name=None, default=None, type=None)
-    post(name=None, default=None, type=None)
-    args(name=None, default=None, type=None)
+    get(name=None, default=None, type=None, getlist=False)
+    post(name=None, default=None, type=None, getlist=False)
+    args(name=None, default=None, type=None, getlist=False)
     cookies(name=None, default=None, type=None)
-    files(name=None)
+    files(name=None, getlist=False)
 
     Fetches request argument and maps it to the function argument.
 
     :param `name`: The name of request argument. If ``name`` is not given, it treats the name of corresponding argument as the name of requment argument.
     :param `default`: The default value to be used if the requested data doesn't exist.
     :param `type`: A callable that is used to convert the retrieved value. If the value can't be converted, the corresponding function argument will be set to the default value.
+    :param `getlist`: Set to `True` to fetch the full list of arguments for a given name (and ignore ``default`` and ``type``). Otherwise it will only fetch the first argument for given name.
 
 .. function::
     collection(*args, **kwargs)

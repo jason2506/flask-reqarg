@@ -1,4 +1,4 @@
-.PHONY: test-py2 test-py3 deploy clean
+.PHONY: test-py2 test-py3 docs deploy clean
 
 PKG = flask.ext.reqarg
 PY2 = python
