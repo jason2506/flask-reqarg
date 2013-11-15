@@ -33,6 +33,26 @@ class TestReqArg(object):
         resp = client.get('/hello/Jason', query_string={'name': 'John'})
         assert_equal(resp.get_data(True), 'Hello, Jason!')
 
+    def test_fetch_request_args_with_view_class(self):
+        class MyView(View):
+            @request_args
+            def dispatch_request(self, name):
+                return 'Hello, {0}!'.format(name)
+
+        class MyMethodView(MethodView):
+            @request_args
+            def get(self, name):
+                return 'Hello, {0}!'.format(name)
+
+        self.app.add_url_rule('/hello', view_func=MyView.as_view('myview'))
+        self.app.add_url_rule('/hello2', view_func=MyMethodView.as_view('mymethodview'))
+
+        client = self.app.test_client()
+        resp = client.get('/hello', query_string={'name': 'John'})
+        assert_equal(resp.get_data(True), 'Hello, John!')
+        resp = client.get('/hello2', query_string={'name': 'John'})
+        assert_equal(resp.get_data(True), 'Hello, John!')
+
     def test_fetch_GET_and_POST_args(self):
         @request_args(x=get(), y=post(), z=args())
         def view(x, y, z):
@@ -135,10 +155,12 @@ class TestReqArg(object):
 
         @request_args(article=collection('title', 'content', 'author'))
         def view(article):
+            assert_equal(type(article), dict)
             return 'Title: {title}\n{content}\nby. {author}'.format(**article)
 
         @request_args(article=collection('title', 'author', text=post('content'), _storage=Article))
         def view_(article):
+            assert_equal(type(article), Article)
             return str(article)
 
         with self.app.test_request_context(
