@@ -90,14 +90,14 @@ def collection(*args, **kwargs):
     source = _extract_opt_source(kwargs)
     storage_type = _extract_opt_storage_type(kwargs)
 
-    def getter(request, arg_name):
+    def fetch(request, arg_name):
         values = {}
         for arg in args:
             values[arg] = request.from_source(source, arg)
         for arg, arg_getter in kwargs.items():
             values[arg] = arg_getter(request, arg)
         return storage_type(**values)
-    return getter
+    return fetch
 
 
 class RequestWrapperBase(object):
